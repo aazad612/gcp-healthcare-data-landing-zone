@@ -1,8 +1,15 @@
-# Non-sensitive identity configuration.
-# Passwords live in sensitive.auto.tfvars (gitignored).
+cloud_identity_customer_id = "C02zryywv"
+admin_impersonation_email  = "aazads@aazads.us"
 
-cloud_identity_customer_id = "C012345678"        # replace with your real customer ID
-admin_impersonation_email  = "aazads@aazads.us"  # your Cloud Identity super admin
+# Added missing OUs referenced by users below
+org_units = [
+  "Engineering", 
+  "Analytics", 
+  "Sales", 
+  "Networking", 
+  "ML", 
+  "Data-Governance"
+]
 
 identity_users = {
   ava = {

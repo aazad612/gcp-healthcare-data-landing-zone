@@ -10,8 +10,13 @@ terraform {
 }
 
 provider "googleworkspace" {
-  # Authentication is handled via ADC, a service account key, or workforce identity.
-  # No hardcoded credentials here.
   customer_id             = var.cloud_identity_customer_id
   impersonated_user_email = var.admin_impersonation_email
+
+  oauth_scopes = [
+    "https://www.googleapis.com/auth/admin.directory.user",
+    "https://www.googleapis.com/auth/admin.directory.group",
+    "https://www.googleapis.com/auth/admin.directory.group.member",
+    "https://www.googleapis.com/auth/admin.directory.orgunit"
+  ]
 }

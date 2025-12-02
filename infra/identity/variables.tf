@@ -8,6 +8,11 @@ variable "admin_impersonation_email" {
   type        = string
 }
 
+variable "org_units" {
+  type    = set(string)
+
+}
+
 variable "identity_users" {
   description = <<EOT
 Map of user keys to user definitions.

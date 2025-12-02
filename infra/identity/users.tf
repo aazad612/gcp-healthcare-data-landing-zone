@@ -1,6 +1,3 @@
-// users.tf
-// Users in Cloud Identity / Google Workspace directory.
-
 resource "googleworkspace_user" "users" {
   for_each = var.identity_users
 
@@ -15,4 +12,7 @@ resource "googleworkspace_user" "users" {
   change_password_at_next_login = true
   recovery_email                = each.value.recovery_email
   org_unit_path                 = each.value.org_unit_path
+
+  # Critical: Wait for OUs to exist before creating users in them
+  depends_on = [googleworkspace_org_unit.main]
 }
