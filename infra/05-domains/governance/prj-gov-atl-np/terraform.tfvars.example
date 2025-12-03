@@ -1,0 +1,18 @@
+# Example tfvars for Governance Atlas Nonprod
+
+org_id            = "9139207439"          # or leave empty and use folder_id instead
+folder_id         = ""                    # e.g. "123456789012"
+billing_account_id = "XXXXXX-XXXXXX-XXXXXX"
+
+activate_apis = [
+  "bigquery.googleapis.com",
+  "dataflow.googleapis.com",
+  "pubsub.googleapis.com",
+  "storage.googleapis.com",
+  "logging.googleapis.com",
+  "monitoring.googleapis.com",
+]
+
+owner_members = [
+  "group:cloud-platform-admins@aazads.us",
+]

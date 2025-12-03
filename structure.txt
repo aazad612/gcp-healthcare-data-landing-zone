@@ -1,0 +1,212 @@
+infra/
+├── org/
+│   ├── folders.tf          # org + folder hierarchy
+│   ├── iam.tf              # org-level IAM bindings
+│   ├── services.tf         # org-level API enablement patterns
+│   ├── billing.tf          # billing account attachment
+│   └── policies.tf         # baseline org policy wiring (global)
+│
+├── networking/
+│   ├── fd-net-usc/       # region us-central1 network hub
+│   │   ├── clinical/
+│   │   │   # These are Shared VPC host projects (network-only)
+│   │   │   ├── prj-net-clin-prod-int-usc/
+│   │   │   ├── prj-net-clin-prod-ext-usc/
+│   │   │   ├── prj-net-clin-prod-res-usc/
+│   │   │   ├── prj-net-clin-nonprod-int-usc/
+│   │   │   └── prj-net-clin-nonprod-ext-usc/
+│   │   │
+│   │   ├── enterprise/
+│   │   │   ├── prj-net-ent-prod-int-usc/
+│   │   │   ├── prj-net-ent-prod-ext-usc/
+│   │   │   ├── prj-net-ent-prod-res-usc/
+│   │   │   ├── prj-net-ent-nonprod-int-usc/
+│   │   │   └── prj-net-ent-nonprod-ext-usc/
+│   │   │
+│   │   └── research/
+│   │       ├── prj-net-res-prod-int-usc/
+│   │       ├── prj-net-res-prod-ext-usc/
+│   │       ├── prj-net-res-prod-res-usc/
+│   │       ├── prj-net-res-nonprod-int-usc/
+│   │       └── prj-net-res-nonprod-ext-usc/
+│   │
+│   ├── shared_vpc/       # reusable modules / patterns for shared VPC
+│   └── common/           # DNS, global FW rules, routes, peering
+│
+├── security/
+│   ├── vpc_sc/
+│   │   ├── clinical/     # perimeters wrapping clinical data projects
+│   │   ├── enterprise/   # perimeters for finance/HR/etc.
+│   │   ├── research/     # perimeters for ML / research
+│   │   └── common/       # access policy, shared access levels, templates
+│   │
+│   └── org_policies/
+│       ├── global/       # top-level org policies (locations, CMEK, etc.)
+│       ├── clinical/     # folder-scoped overrides for clinical
+│       ├── enterprise/   # folder-scoped overrides for enterprise
+│       └── research/     # folder-scoped overrides for research
+│
+├── project-factory/
+│   ├── host/             # creation of prj-net-* shared VPC host projects
+│   └── service/          # creation of prj-de-*, prj-bi-*, prj-ml-* service projects
+│
+├── domains/
+│   ├── clinical/
+│   │   # Synthea data engineering projects (medallion via datasets in BQ)
+│   │   ├── prj-de-synthea-prod/
+│   │   │   ├── bigquery/         # datasets & tables (synthea_bronze/silver/gold)
+│   │   │   ├── storage/          # raw/curated buckets
+│   │   │   ├── iam/              # project-level IAM bindings
+│   │   │   ├── dataflow/         # job templates / runners infra
+│   │   │   └── atlas_integration/# SA, VPC, DNS, connectors to Atlas
+│   │   │
+│   │   └── prj-de-synthea-nonprod/
+│   │       ├── bigquery/
+│   │       ├── storage/
+│   │       ├── iam/
+│   │       ├── dataflow/
+│   │       └── atlas_integration/
+│   │
+│   ├── enterprise/
+│   │   ├── prj-de-finance-analytics-prod/
+│   │   ├── prj-de-finance-analytics-nonprod/
+│   │   ├── prj-de-hr-analytics-prod/
+│   │   └── prj-de-hr-analytics-nonprod/
+│   │   # same pattern as synthea: bigquery/, storage/, iam/, etc. inside each
+│   │
+│   └── research/
+│       ├── prj-ml-imaging-prod/
+│       ├── prj-ml-imaging-nonprod/
+│       ├── prj-ml-experiments-prod/
+│       └── prj-ml-experiments-nonprod/
+│       # again: each project dir would have bigquery/, storage/, iam/, compute/...
+│
+├── governance/
+│   ├── prj-data-governance-atlas-prod/
+│   │   ├── compute/      # GCE/GKE/Composer for running Atlas services
+│   │   ├── network/      # subnet attachment, FW rules, private DNS, LB
+│   │   ├── iam/          # roles for governance team + service SAs
+│   │   ├── config/       # Atlas bootstrap config, env vars, secrets wiring
+│   │   └── connectors/   # integration to BQ, GCS, other systems
+│   │
+│   └── prj-data-governance-atlas-nonprod/
+│       ├── compute/
+│       ├── network/
+│       ├── iam/
+│       ├── config/
+│       └── connectors/
+│
+└── modules/
+    ├── folder/           # reusable folder creation + IAM
+    ├── project/          # generic project factory module
+    ├── networking/       # VPC, subnets, FW, routes
+    ├── vpc_sc/           # service perimeter & access level modules
+    ├── iam/              # opinionated IAM bindings module
+    └── compute/          # GCE instance / MIG / GKE patterns
+
+
+
+.
+├── domains
+│   ├── clinical
+│   │   ├── prj-de-synthea-nonprod
+│   │   │   ├── atlas_integration
+│   │   │   ├── bigquery
+│   │   │   ├── dataflow
+│   │   │   ├── iam
+│   │   │   └── storage
+│   │   └── prj-de-synthea-prod
+│   │       ├── atlas_integration
+│   │       ├── bigquery
+│   │       ├── dataflow
+│   │       ├── iam
+│   │       └── storage
+│   ├── enterprise
+│   │   ├── prj-de-finance-analytics-nonprod
+│   │   ├── prj-de-finance-analytics-prod
+│   │   ├── prj-de-hr-analytics-nonprod
+│   │   └── prj-de-hr-analytics-prod
+│   └── research
+│       ├── prj-ml-experiments-nonprod
+│       ├── prj-ml-experiments-prod
+│       ├── prj-ml-imaging-nonprod
+│       └── prj-ml-imaging-prod
+├── governance
+│   ├── prj-data-governance-atlas-nonprod
+│   │   ├── compute
+│   │   ├── config
+│   │   ├── connectors
+│   │   ├── iam
+│   │   └── network
+│   └── prj-data-governance-atlas-prod
+│       ├── compute
+│       ├── config
+│       ├── connectors
+│       ├── iam
+│       └── network
+├── identity
+│   ├── groups.tf
+│   ├── main.tf
+│   ├── memberships.tf
+│   ├── ous.tf
+│   ├── outputs.tf
+│   ├── sensitive.auto.tfvars
+│   ├── setup.sh
+│   ├── terraform.tfstate
+│   ├── terraform.tfstate.backup
+│   ├── terraform.tfvars
+│   ├── users.tf
+│   └── variables.tf
+├── modules
+│   ├── compute
+│   ├── folder
+│   ├── iam
+│   ├── networking
+│   ├── project
+│   └── vpc_sc
+├── networking
+│   ├── common
+│   ├── fd-net-usc
+│   │   ├── clinical
+│   │   │   ├── prj-net-clin-nonprod-ext-usc
+│   │   │   ├── prj-net-clin-nonprod-int-usc
+│   │   │   ├── prj-net-clin-prod-ext-usc
+│   │   │   ├── prj-net-clin-prod-int-usc
+│   │   │   └── prj-net-clin-prod-res-usc
+│   │   ├── enterprise
+│   │   │   ├── prj-net-ent-nonprod-ext-usc
+│   │   │   ├── prj-net-ent-nonprod-int-usc
+│   │   │   ├── prj-net-ent-prod-ext-usc
+│   │   │   ├── prj-net-ent-prod-int-usc
+│   │   │   └── prj-net-ent-prod-res-usc
+│   │   └── research
+│   │       ├── prj-net-res-nonprod-ext-usc
+│   │       ├── prj-net-res-nonprod-int-usc
+│   │       ├── prj-net-res-prod-ext-usc
+│   │       ├── prj-net-res-prod-int-usc
+│   │       └── prj-net-res-prod-res-usc
+│   └── shared_vpc
+├── org
+│   ├── billing.tf
+│   ├── folders.tf
+│   ├── main.tf
+│   ├── org_iam.tf
+│   ├── org_policies.tf
+│   ├── outputs.tf
+│   ├── sensitive.auto.tfvars
+│   ├── terraform.tfvars
+│   └── variables.tf
+├── project-factory
+│   ├── host
+│   └── service
+└── security
+    ├── org_policies
+    │   ├── clinical
+    │   ├── enterprise
+    │   ├── global
+    │   └── research
+    └── vpc_sc
+        ├── clinical
+        ├── common
+        ├── enterprise
+        └── research
