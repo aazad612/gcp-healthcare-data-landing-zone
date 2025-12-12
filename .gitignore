@@ -98,7 +98,7 @@ ipython_config.py
 Thumbs.db
 ehthumbs.db
 
-
+.idea
 
 local_convert/
 src/smart_9x16/sample.mov
