@@ -1,0 +1,42 @@
+graph TD
+    %% Nodes and Styles
+    Org[GCP Organization]
+    
+    subgraph Folders
+        Shared[📂 Shared Services]
+        Health[📂 Healthcare Platform]
+    end
+
+    subgraph "Shared Services Domain"
+        %% Quotes added around the label text below to fix the syntax error
+        PrjSharedNP["PROJECT: prj-lbd-shared-np<br/>(Standards, Airflow, Dataflow)"]
+        PrjSharedPD["PROJECT: prj-lbd-shared-pd<br/>(Standards, Airflow, Dataflow)"]
+    end
+
+    subgraph "Clinical Domain (Synthea)"
+        PrjClinNP["PROJECT: prj-clin-syn-np<br/>(Dev/UAT/QA - 
+                                                  BigQuery (Bronze/Silver/Gold), 
+                                                    GCS, PubSub)"]
+        PrjClinPD["PROJECT: prj-clin-syn-pd<br/>(Prod - 
+                                                  BigQuery (Bronze/Silver/Gold), 
+                                                    GCS, PubSub)"]
+    end
+
+    %% Relationships
+    Org --> Shared
+    Org --> Health
+
+    Shared --> PrjSharedNP
+    Shared --> PrjSharedPD
+
+    Health --> PrjClinNP
+    Health --> PrjClinPD
+
+    %% Styling
+    classDef org fill:#4285F4,stroke:#333,stroke-width:2px,color:white;
+    classDef folder fill:#F4B400,stroke:#333,stroke-width:2px,color:white;
+    classDef project fill:#0F9D58,stroke:#333,stroke-width:1px,color:white;
+    
+    class Org org;
+    class Shared,Health folder;
+    class PrjSharedNP,PrjSharedPD,PrjClinNP,PrjClinPD project;

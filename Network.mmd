@@ -1,0 +1,78 @@
+graph TD
+    %% =========================================
+    %% 1. ON-PREMISE CONNECTIVITY
+    %% =========================================
+    subgraph OnPrem_Zone [🏢 On-Premise & Interconnect]
+        OnPrem[Legacy Data Center<br/>VPN - Direct Connect]
+        Interconnect((⚡ Dedicated<br/>Interconnect))
+    end
+
+    %% =========================================
+    %% 2. THE HUB (Networking Core)
+    %% =========================================
+    subgraph Hub_Project [PROJECT: prj-net-common-pd-host]
+        subgraph Hub_VPC [vpc-hub-main]
+            direction TB
+            Hub_Subnet["subnet: sb-hub-main-usc1<br/>10.0.0.0/24"]
+            Hub_NAT[Cloud NAT - Router]
+        end
+    end
+
+    %% =========================================
+    %% 3. THE SPOKES (Domain Host Projects)
+    %% =========================================
+
+    %% --- CLINICAL SPOKE ---
+    subgraph Clin_Project [PROJECT: prj-net-clin-pd-host]
+        subgraph Clin_VPC [vpc-clin-prod]
+            Clin_Subnet_Int["subnet: sb-clin-prod-int-usc1<br/>10.10.1.0/24<br/>🔒 Private-Internal"]
+            Clin_Subnet_Ext["subnet: sb-clin-prod-ext-usc1<br/>10.10.2.0/24<br/>🌐 External-Ingress"]
+        end
+    end
+
+    %% --- ENTERPRISE SPOKE ---
+    subgraph Ent_Project [PROJECT: prj-net-ent-pd-host]
+        subgraph Ent_VPC [vpc-ent-prod]
+            Ent_Subnet["subnet: sb-ent-prod-int-usc1<br/>10.20.1.0/24"]
+        end
+    end
+
+    %% --- RESEARCH SPOKE ---
+    subgraph Res_Project [PROJECT: prj-net-res-pd-host]
+        subgraph Res_VPC [vpc-res-prod]
+            Res_Subnet["subnet: sb-res-prod-int-usc1<br/>10.30.1.0/24"]
+        end
+    end
+
+    %% =========================================
+    %% CONNECTIONS & PEERING
+    %% =========================================
+
+    %% 1. Hybrid Link
+    OnPrem === Interconnect
+    Interconnect ===|BGP Routing| Hub_NAT
+
+    %% 2. Hub <-> Spoke Peering
+    Hub_VPC -.-> |"VPC Peering<br/>Transit"| Clin_VPC
+    Hub_VPC -.-> |"VPC Peering<br/>Transit"| Ent_VPC
+    Hub_VPC -.-> |"VPC Peering<br/>Transit"| Res_VPC
+
+    %% =========================================
+    %% STYLING
+    %% =========================================
+    classDef onprem fill:#424242,stroke:#000,stroke-width:2px,color:white;
+    classDef hubProject fill:#E3F2FD,stroke:#1565C0,stroke-width:2px;
+    classDef hubVPC fill:#BBDEFB,stroke:#1976D2,stroke-width:1px;
+    classDef spokeProject fill:#F1F8E9,stroke:#558B2F,stroke-width:2px;
+    classDef spokeVPC fill:#DCEDC8,stroke:#689F38,stroke-width:1px,stroke-dasharray: 5 5;
+    classDef subnet fill:#FFFFFF,stroke:#333,stroke-width:1px;
+
+    class OnPrem,Interconnect onprem;
+    class Hub_Project hubProject;
+    class Hub_VPC hubVPC;
+    class Clin_Project,Ent_Project,Res_Project spokeProject;
+    class Clin_VPC,Ent_VPC,Res_VPC spokeVPC;
+    class Hub_Subnet,Clin_Subnet_Int,Clin_Subnet_Ext,Ent_Subnet,Res_Subnet subnet;
+
+    %% Highlight the peering links orange
+    linkStyle 2,3,4 stroke:#F57C00,stroke-width:3px,stroke-dasharray: 5 5;

@@ -1,0 +1,72 @@
+graph TD
+    %% =========================================
+    %% 0. THE INTERNET
+    %% =========================================
+    Internet((☁️ Internet))
+
+    %% =========================================
+    %% 1. ON-PREMISE CONNECTIVITY
+    %% =========================================
+    subgraph OnPrem_Zone [🏢 On-Premise & Interconnect]
+        OnPrem[Legacy Data Center<br/>VPN - Direct Connect]
+        Interconnect((⚡ Dedicated<br/>Interconnect))
+    end
+
+    %% =========================================
+    %% 2. THE HUB (Networking Core)
+    %% =========================================
+    subgraph Hub_Project [PROJECT: prj-net-common-pd-host]
+        subgraph Hub_VPC [vpc-hub-main]
+            direction TB
+            Hub_Subnet["subnet: sb-hub-main-usc1<br/>10.0.0.0/24"]
+            Hub_NAT[Cloud NAT - Router]
+        end
+    end
+
+    %% =========================================
+    %% 3. THE SPOKES (Domain Host Projects)
+    %% =========================================
+
+    %% --- CLINICAL SPOKE (High Security) ---
+    subgraph Clin_Project [PROJECT: prj-net-clin-pd-host]
+        subgraph Clin_VPC [vpc-clin-prod]
+            direction TB
+            %% Firewall Node representing the separation
+            FW_Ingress{🔥 FW: Ingress<br/>Allow 443}
+            FW_Internal{🔥 FW: Internal<br/>Allow 10.x Only}
+            
+            Clin_Subnet_Ext["subnet: sb-clin-prod-ext-usc1<br/>10.10.2.0/24<br/>🌐 External-Ingress"]
+            Clin_Subnet_Int["subnet: sb-clin-prod-int-usc1<br/>10.10.1.0/24<br/>🔒 Private-Internal"]
+        end
+    end
+
+    %% --- ENTERPRISE SPOKE (Standard) ---
+    subgraph Ent_Project [PROJECT: prj-net-ent-pd-host]
+        subgraph Ent_VPC [vpc-ent-prod]
+            Ent_Subnet["subnet: sb-ent-prod-int-usc1<br/>10.20.1.0/24"]
+        end
+    end
+
+    %% --- RESEARCH SPOKE (Standard) ---
+    subgraph Res_Project [PROJECT: prj-net-res-pd-host]
+        subgraph Res_VPC [vpc-res-prod]
+            Res_Subnet["subnet: sb-res-prod-int-usc1<br/>10.30.1.0/24"]
+        end
+    end
+
+    %% =========================================
+    %% CONNECTIONS & PEERING
+    %% =========================================
+
+    %% 1. Hybrid Link
+    OnPrem === Interconnect
+    Interconnect ===|BGP Routing| Hub_NAT
+
+    %% 2. Internet Connectivity
+    Hub_NAT ==>|NAT Egress| Internet
+    Internet -.->|HTTPS Ingress| FW_Ingress
+    FW_Ingress ==> Clin_Subnet_Ext
+    
+    %% 3. Internal Security Flow
+    Clin_Subnet_Ext -.-> FW_Internal
+    FW_Internal ==> Clin_Subnet_
