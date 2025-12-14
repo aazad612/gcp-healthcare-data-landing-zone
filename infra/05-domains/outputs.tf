@@ -12,3 +12,11 @@ output "project_numbers" {
   value = { for k, v in module.service_projects : k => v.project_number }
 }
 
+# Export the GCS Service Account email so Layer 06 can use it for permissions
+output "gcs_service_accounts" {
+  description = "Map of GCS Service Account emails per project key."
+  value = {
+    # This iterates over the projects you just created to find their unique GCS email
+    for k, v in module.service_projects : k => "service-${v.project_number}@gs-project-accounts.iam.gserviceaccount.com"
+  }
+}

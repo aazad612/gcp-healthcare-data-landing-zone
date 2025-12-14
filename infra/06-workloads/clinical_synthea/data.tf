@@ -7,10 +7,24 @@ data "terraform_remote_state" "domains" {
 }
 
 locals {
-  # Look up the real Project ID using the logical key (e.g., clin_syn_np)
-  project_id = data.terraform_remote_state.domains.outputs.project_ids[var.target_project_key]
-  
-  # Look up the Default Service Account email (since you kept the default)
-  # We need this to grant it permissions on buckets/datasets
-  default_sa = data.terraform_remote_state.domains.outputs.service_accounts[var.target_project_key]
+  # 1. Map Environment -> Project ID
+  # Example: "dev" -> "prj-clin-syn-np", "test" -> "prj-clin-syn-uat"
+  env_project_ids = {
+    for env, key in var.env_project_keys : 
+    env => data.terraform_remote_state.domains.outputs.project_ids[key]
+  }
+
+  # 2. Map Environment -> Default Compute Service Account
+  # Used for BigQuery/Dataset permissions
+  env_service_accounts = {
+    for env, key in var.env_project_keys : 
+    env => data.terraform_remote_state.domains.outputs.service_accounts[key]
+  }
+
+  # 3. Map Environment -> GCS Service Account
+  # Used for Pub/Sub publishing permissions. 
+  env_gcs_service_accounts = {
+    for env, key in var.env_project_keys : 
+    env => data.terraform_remote_state.domains.outputs.gcs_service_accounts[key]
+  }
 }

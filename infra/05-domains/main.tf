@@ -81,6 +81,7 @@ resource "google_project_iam_member" "project_sa_roles" {
   project = each.value.project_id
   role    = each.value.role
   member  = "serviceAccount:project-service-account@${each.value.project_id}.iam.gserviceaccount.com"
+  depends_on = [module.service_projects]
 }
 
 resource "google_project_iam_member" "shared_bq_user" {
@@ -89,6 +90,7 @@ resource "google_project_iam_member" "shared_bq_user" {
   project = "prj-lbd-shared-np"
   role    = "roles/bigquery.user"
   member  = "serviceAccount:project-service-account@${each.value.project_id}.iam.gserviceaccount.com"
+  depends_on = [module.service_projects]
 }
 
 

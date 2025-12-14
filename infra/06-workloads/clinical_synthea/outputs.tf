@@ -1,6 +1,6 @@
-output "project_id" {
-  description = "The Service Project ID where resources were deployed."
-  value       = local.project_id
+output "project_ids" {
+  description = "The Service Project IDs where resources were deployed, per environment."
+  value       = local.env_project_ids
 }
 
 output "bronze_datasets" {
@@ -19,7 +19,7 @@ output "gold_datasets" {
 }
 
 output "interface_datasets" {
-  description = "Map of Interface (View) Dataset IDs per environment. Connect Tableau here."
+  description = "Map of Interface (View) Dataset IDs per environment."
   value       = { for env, ds in google_bigquery_dataset.interface : env => ds.dataset_id }
 }
 
@@ -28,7 +28,7 @@ output "data_lake_buckets" {
   value       = { for env, bkt in google_storage_bucket.data_lake : env => bkt.name }
 }
 
-output "dataflow_temp_buckets" {
-  description = "Map of Dataflow Temp Bucket names per environment."
-  value       = { for env, bkt in google_storage_bucket.dataflow_temp : env => bkt.name }
-}
+# output "dataflow_temp_buckets" {
+#   description = "Map of Dataflow Temp Bucket names per environment."
+#   value       = { for env, bkt in google_storage_bucket.dataflow_temp : env => bkt.name }
+# }

@@ -88,6 +88,38 @@ service_projects = {
     ]
   }
 
+  clin_syn_uat = {
+    project_id       = "prj-clin-syn-uat"
+    folder_key       = "healthcare_platform"
+    host_project_key = "clinical"
+    subnet_key       = "clin_int"
+    apis = [
+      "bigquery.googleapis.com",
+      "dataflow.googleapis.com",
+      "storage-component.googleapis.com",
+      "pubsub.googleapis.com",         # Streaming ingestion
+      "cloudfunctions.googleapis.com", # Event-based triggers
+      "run.googleapis.com",            # Data Contracts / API
+      "dlp.googleapis.com"             # Local PII scanning
+    ]
+  }
+
+  clin_syn_qa = {
+    project_id       = "prj-clin-syn-qa"
+    folder_key       = "healthcare_platform"
+    host_project_key = "clinical"
+    subnet_key       = "clin_int"
+    apis = [
+      "bigquery.googleapis.com",
+      "dataflow.googleapis.com",
+      "storage-component.googleapis.com",
+      "pubsub.googleapis.com",         # Streaming ingestion
+      "cloudfunctions.googleapis.com", # Event-based triggers
+      "run.googleapis.com",            # Data Contracts / API
+      "dlp.googleapis.com"             # Local PII scanning
+    ]
+  }
+
   # --- 3. CLINICAL DOMAIN (Synthea) - PROD ---
   clin_syn_pd = {
     project_id       = "prj-clin-syn-pd"
